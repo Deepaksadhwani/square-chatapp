@@ -1,19 +1,23 @@
 import express from "express";
-import dotenv from "dotenv";
 import cors from "cors";
 import { rootRouter } from "./routes";
+import { config } from "dotenv";
+import cookieParser from "cookie-parser";
+import mongoose from "mongoose";
 
-dotenv.config();
+config();
 const app = express();
-
+const DATABASE_URL: string = process.env.DATABASE_URL || "";
 app.use(
   cors({
-    origin: "*",
+    origin: "http://localhost:5173",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
   })
 );
 app.use(express.json());
-
-
+app.use(cookieParser());
+app.use("/api/v1", rootRouter);
 
 app.get("/", (req, res) => {
   try {
@@ -22,7 +26,12 @@ app.get("/", (req, res) => {
     res.status(500).send("Internal server found.");
   }
 });
-app.use("/api/v1", rootRouter);
+
+mongoose
+  .connect(DATABASE_URL)
+  .then(() => console.log("DB connection successful."))
+  .catch((err) => console.log(err.message));
+
 app.listen(process.env.PORT, () => {
   console.log(`server is running on port ${process.env.PORT}`);
 });
