@@ -9,6 +9,7 @@ import {
 
 const maxAge = 3 * 24 * 60 * 60 * 1000;
 
+// signup Controller
 export const signupController = async (req: Request, res: Response) => {
   const parsed = authValidationSchema.safeParse(req.body);
   if (!parsed.success) {
@@ -34,6 +35,7 @@ export const signupController = async (req: Request, res: Response) => {
     });
     res.status(201).json({
       message: "User account has been successfully created.",
+      id: user._id,
       firstName: user.firstName,
       lastName: user.lastName,
       image: user.image,
@@ -46,6 +48,8 @@ export const signupController = async (req: Request, res: Response) => {
   }
 };
 
+
+// login controller
 export const loginController = async (req: Request, res: Response) => {
   const parsed = authValidationSchema.safeParse(req.body);
   if (!parsed.success) {
@@ -69,6 +73,7 @@ export const loginController = async (req: Request, res: Response) => {
           sameSite: "none",
         });
         res.status(201).json({
+          id: user._id,
           message: "User account has been successfully logged in.",
           firstName: user.firstName,
           lastName: user.lastName,

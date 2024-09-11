@@ -1,6 +1,4 @@
-import { genSalt, hash } from "bcrypt";
 import mongoose from "mongoose";
-import { boolean } from "zod";
 
 const userSchema = new mongoose.Schema({
   email: {
@@ -33,7 +31,6 @@ const userSchema = new mongoose.Schema({
     default: false,
   },
 });
-
 
 const User = mongoose.model("Users", userSchema);
 

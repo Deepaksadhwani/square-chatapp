@@ -6,11 +6,16 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useState } from "react";
 import { toast } from "sonner";
 import { apiClient } from "@/lib/api-client";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "@/store/app-store";
+import { setUserData } from "@/store/slices/user-slice";
 const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-
+  const navigate = useNavigate();
+  const dispatch = useDispatch<AppDispatch>()
   const validateSignup = () => {
     if (!email.length) {
       toast.error("Email is required.");
@@ -33,6 +38,11 @@ const Auth = () => {
         { email, password },
         { withCredentials: true },
       );
+      if (res.data.id) {
+        dispatch(setUserData(res.data))
+        if (res.data.profileSetup) navigate("/chat");
+        else navigate("/profile");
+      }
       console.log(res);
     } catch (error) {
       console.log(error);
@@ -46,6 +56,10 @@ const Auth = () => {
           { email, password },
           { withCredentials: true },
         );
+        if (res.status === 201) {
+           dispatch(setUserData(res.data))
+          navigate("/profile");
+        }
         console.log(res);
       } catch (error) {
         console.log(error);
@@ -66,7 +80,7 @@ const Auth = () => {
             </p>
           </div>
           <div className="flex w-full items-center justify-center">
-            <Tabs className="w-3/4">
+            <Tabs className="w-3/4" defaultValue="login">
               <TabsList className="w-full rounded-none bg-transparent">
                 <TabsTrigger
                   className="w-full rounded-none border-b-2 p-3 text-black text-opacity-90 transition-all duration-300 data-[state=active]:border-b-purple-500 data-[state=active]:bg-transparent data-[state=active]:font-semibold data-[state=active]:text-black"
