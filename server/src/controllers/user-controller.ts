@@ -1,6 +1,14 @@
 import { Request, Response } from "express";
-import { findUser, getUser, insertUser } from "../services/user-service";
-import { authValidationSchema } from "../utils/zod-schemas";
+import {
+  findUser,
+  getUser,
+  insertUser,
+  updateUserProfile,
+} from "../services/user-service";
+import {
+  authValidationSchema,
+  updateProfileSchema,
+} from "../utils/zod-schemas";
 import {
   generateToken,
   hashPassword,
@@ -98,11 +106,41 @@ export const getUserInfoController = async (req: any, res: Response) => {
         .status(404)
         .json({ message: "User with the given id not found." });
     }
-   
+
     return res.status(200).json({
       message: "user information is successfully fetched",
       data: userData,
     });
+  } catch (error) {
+    console.log({ error });
+    return res.status(500).json({ message: "Internal Server Error." });
+  }
+};
+
+// update user profile
+export const updateProfileController = async (req: any, res: Response) => {
+  console.log(req.body)
+  const parsed = updateProfileSchema.safeParse(req.body);
+  if (!parsed.success) {
+    return res
+      .status(400)
+      .json({ error: "FirstName LastName and color is required." });
+  }
+  const { firstName, lastName, color } = parsed.data;
+  try {
+    const updatedUserData = await updateUserProfile(req.userId, {
+      firstName,
+      lastName,
+      color,
+      profileSetup: true,
+    });
+    
+    res
+      .status(200)
+      .json({
+        message: "user profile has been successfully updated",
+        data: updatedUserData,
+      });
   } catch (error) {
     console.log({ error });
     return res.status(500).json({ message: "Internal Server Error." });

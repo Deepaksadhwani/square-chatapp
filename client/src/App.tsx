@@ -12,13 +12,13 @@ interface RouteProps {
   children: React.ReactNode;
 }
 
-// privateRoute component 
+// privateRoute component
 const PrivateRoute: FC<RouteProps> = ({ children }) => {
   const dataPresent = useSelector((state: RootState) => state.user.userData);
   return dataPresent ? children : <Navigate to="/auth" />;
 };
 
-//AuthRoute component 
+//AuthRoute component
 const AuthRoute: FC<RouteProps> = ({ children }) => {
   const dataPresent = useSelector((state: RootState) => state.user.userData);
   return dataPresent ? <Navigate to="/chat" /> : children;
@@ -26,7 +26,7 @@ const AuthRoute: FC<RouteProps> = ({ children }) => {
 
 
 
-//App component 
+//App component
 const App = () => {
   const userData = useSelector((state: RootState) => state.user.userData);
   const [loading, setLoading] = useState(true);
@@ -34,12 +34,17 @@ const App = () => {
   useEffect(() => {
     const getUserData = async () => {
       try {
-        const {data} = await apiClient.get("/user/user-info", {
+        const response = await apiClient.get("/user/user-info", {
           withCredentials: true,
         });
-        dispatch(setUserData(data.data))
+        console.log(response)
+        if (response.status === 200) {
+          dispatch(setUserData(response.data.data));
+        }
       } catch (error) {
         console.log({ error });
+      }finally {
+        setLoading(false)
       }
     };
     if (!userData) {
@@ -50,7 +55,7 @@ const App = () => {
   }, [userData, setUserData]);
 
   if (loading) {
-    return <div>Loading....</div>
+    return <div>Loading....</div>;
   }
   return (
     <BrowserRouter>

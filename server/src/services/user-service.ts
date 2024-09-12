@@ -14,3 +14,19 @@ export async function getUser(id: string) {
   const res = await User.findById(id).select("-password");
   return res;
 }
+
+export async function updateUserProfile(
+  id: string,
+  data: {
+    firstName: string;
+    lastName: string;
+    color: number;
+    profileSetup: boolean;
+  }
+) {
+  const res = await User.findByIdAndUpdate(id, data, {
+    new: true,
+    runValidators: true,
+  }).select("-password");
+  return res;
+}

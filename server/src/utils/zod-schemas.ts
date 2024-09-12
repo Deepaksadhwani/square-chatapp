@@ -5,3 +5,8 @@ export const authValidationSchema = z.object({
   password: z.string(),
 });
 
+export const updateProfileSchema = z.object({
+  firstName: z.string(),
+  lastName: z.string(),
+  color: z.number(),
+});
