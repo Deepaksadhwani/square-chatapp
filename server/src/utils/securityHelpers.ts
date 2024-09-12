@@ -27,6 +27,6 @@ export const generateToken = (id: number) => {
   return jwt.sign({ id }, secretKey);
 };
 
-export const verifyToken = (token: string) => {
+export const verifyJwtToken = (token: string) => {
   return jwt.verify(token, secretKey);
 };

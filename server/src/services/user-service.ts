@@ -7,5 +7,10 @@ export async function insertUser(email: string, password: string) {
 
 export async function findUser(email: string) {
   const user = await User.findOne({ email });
-  return user
+  return user;
+}
+
+export async function getUser(id: string) {
+  const res = await User.findById(id).select("-password");
+  return res;
 }

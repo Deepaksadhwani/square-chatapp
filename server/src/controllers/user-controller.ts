@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import { findUser, insertUser } from "../services/user-service";
+import { findUser, getUser, insertUser } from "../services/user-service";
 import { authValidationSchema } from "../utils/zod-schemas";
 import {
   generateToken,
@@ -48,7 +48,6 @@ export const signupController = async (req: Request, res: Response) => {
   }
 };
 
-
 // login controller
 export const loginController = async (req: Request, res: Response) => {
   const parsed = authValidationSchema.safeParse(req.body);
@@ -87,5 +86,25 @@ export const loginController = async (req: Request, res: Response) => {
     }
   } catch (error) {
     res.status(500).json({ Message: "Internal Server Error." });
+  }
+};
+
+//get the user information for persistent login after refresh
+export const getUserInfoController = async (req: any, res: Response) => {
+  try {
+    const userData = await getUser(req.userId);
+    if (!userData) {
+      return res
+        .status(404)
+        .json({ message: "User with the given id not found." });
+    }
+   
+    return res.status(200).json({
+      message: "user information is successfully fetched",
+      data: userData,
+    });
+  } catch (error) {
+    console.log({ error });
+    return res.status(500).json({ message: "Internal Server Error." });
   }
 };
