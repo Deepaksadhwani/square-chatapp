@@ -17,6 +17,7 @@ app.use(
 );
 app.use(express.json());
 app.use(cookieParser());
+app.use("/uploads/profiles", express.static("uploads/profiles"));
 app.use("/api/v1", rootRouter);
 
 app.get("/", (req, res) => {

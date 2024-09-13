@@ -1,8 +1,10 @@
-import { Request, Response } from "express";
+import { Request,  Response } from "express";
 import {
+  deleteUserImage,
   findUser,
   getUser,
   insertUser,
+  updateUserImage,
   updateUserProfile,
 } from "../services/user-service";
 import {
@@ -14,6 +16,8 @@ import {
   hashPassword,
   verifyPassword,
 } from "../utils/securityHelpers";
+import { renameSync, unlinkSync } from "fs";
+import User from "../models/user";
 
 const maxAge = 3 * 24 * 60 * 60 * 1000;
 
@@ -68,7 +72,7 @@ export const loginController = async (req: Request, res: Response) => {
   const user: any = await findUser(email);
   try {
     if (!user) {
-      return res.status(400).json({ Message: "User does not already exist." });
+      return res.status(400).json({ Message: "User does not exist." });
     } else {
       const isPasswordMatched = await verifyPassword(password, user.password);
       if (isPasswordMatched) {
@@ -119,7 +123,7 @@ export const getUserInfoController = async (req: any, res: Response) => {
 
 // update user profile
 export const updateProfileController = async (req: any, res: Response) => {
-  console.log(req.body)
+  console.log(req.body);
   const parsed = updateProfileSchema.safeParse(req.body);
   if (!parsed.success) {
     return res
@@ -134,13 +138,52 @@ export const updateProfileController = async (req: any, res: Response) => {
       color,
       profileSetup: true,
     });
-    
-    res
-      .status(200)
-      .json({
-        message: "user profile has been successfully updated",
-        data: updatedUserData,
-      });
+
+    res.status(200).json({
+      message: "user profile has been successfully updated",
+      data: updatedUserData,
+    });
+  } catch (error) {
+    console.log({ error });
+    return res.status(500).json({ message: "Internal Server Error." });
+  }
+};
+
+// updateAddImageController
+export const addImageController = async (req: any, res: Response) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: "File is required." });
+    }
+    const date = Date.now();
+    let fileName = "uploads/profiles/" + date + req.file.originalname;
+    renameSync(req.file.path, fileName);
+    console.log(fileName);
+    const updatedUser = await updateUserImage(req.userId, fileName);
+    res.status(200).json({
+      image: updatedUser,
+    });
+  } catch (error) {
+    console.log({ error });
+    return res.status(500).json({ message: "Internal Server Error." });
+  }
+};
+
+//delete image  Controller
+export const removeImageController = async (req: any, res: Response) => {
+  console.log(req.body);
+  try {
+    const user = await deleteUserImage(req.userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found." });
+    }
+
+    if (user.image) {
+      console.log("hit")
+      unlinkSync(user.image);
+    }
+
+    res.status(200).json({ message: "Profile image removed Successfully." });
   } catch (error) {
     console.log({ error });
     return res.status(500).json({ message: "Internal Server Error." });

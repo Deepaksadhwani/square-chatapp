@@ -4,8 +4,9 @@ import { apiClient } from "@/lib/api-client";
 import { colors, getColor } from "@/lib/utils";
 import { AppDispatch, RootState } from "@/store/app-store";
 import { setUserData } from "@/store/slices/user-slice";
+import { IMAGE_URL } from "@/utils/constants";
 import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FaPlus, FaTrash } from "react-icons/fa";
 import { IoArrowBack } from "react-icons/io5";
 import { useDispatch, useSelector } from "react-redux";
@@ -15,12 +16,13 @@ import { toast } from "sonner";
 const Profile = () => {
   const navigate = useNavigate();
   const userData = useSelector((state: RootState) => state.user?.userData);
-  const [firstName, setFirstName] = useState(userData.firstName || "");
-  const [lastName, setLastName] = useState(userData.lastName || "");
-  const [image, setImage] = useState(null);
-  const [selectColor, setSelectColor] = useState(userData.color || 0);
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [image, setImage] = useState<any>(null);
+  const [selectColor, setSelectColor] = useState(0);
   const [hover, setHover] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
+  const fileInputRef = useRef<any>(null);
 
   const validateProfile = () => {
     if (!firstName) {
@@ -53,10 +55,70 @@ const Profile = () => {
     }
   };
 
+  const exitNavigateHandler = () => {
+    if (userData.profileSetup) {
+      navigate("/chat");
+    } else {
+      toast.error("Please setup profile.");
+    }
+  };
+
+  const handleFileInputClick = () => {
+    fileInputRef.current.click();
+  };
+
+  const handleImageChange = async (event: any) => {
+    const file = event.target.files[0];
+    if (file) {
+      try {
+        const formData = new FormData();
+        formData.append("profile-image", file);
+        const response = await apiClient.post(
+          "user/add-profile-image",
+          formData,
+          { withCredentials: true },
+        );
+
+        if (response.status === 200 && response.data.image) {
+          dispatch(
+            setUserData({ ...userData, image: response.data.image.image }),
+          );
+          toast.success("Image updated successfully.");
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+  console.log(userData);
+  const handleDeleteImage = async () => {
+    try {
+      const res = await apiClient.delete("user/remove-profile-image", {
+        withCredentials: true,
+      });
+      if (res.status === 200) {
+        dispatch(setUserData({ ...userData, image: null }));
+        toast.success("Image removed successfully.");
+        setImage(null);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    if (userData.profileSetup) {
+      setFirstName(userData.firstName);
+      setLastName(userData.lastName);
+      setSelectColor(userData.color);
+    }
+    if (userData.image) setImage(`${IMAGE_URL}/${userData.image}`);
+  }, [userData]);
+
   return (
     <div className="flex h-screen flex-col items-center justify-center gap-10 bg-[#1b1c24]">
       <div className="flex w-[80vw] flex-col gap-10 md:w-max">
-        <div>
+        <div onClick={exitNavigateHandler}>
           <IoArrowBack className="cursor-pointer text-4xl text-white/90 lg:text-6xl" />
         </div>
         <div className="grid grid-cols-2">
@@ -76,14 +138,15 @@ const Profile = () => {
                 <div
                   className={`flex h-32 w-32 items-center justify-center rounded-full border-[1px] text-5xl uppercase md:h-48 md:w-48 ${getColor(selectColor)}`}
                 >
-                  {firstName
-                    ? firstName[0]
-                    :  userData.email[0]}
+                  {firstName ? firstName[0] : userData.email[0]}
                 </div>
               )}
             </Avatar>
             {hover && (
-              <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 ring-fuchsia-50">
+              <div
+                onClick={image ? handleDeleteImage : handleFileInputClick}
+                className="absolute inset-0 flex items-center justify-center rounded-full bg-black/50 ring-fuchsia-50"
+              >
                 {image ? (
                   <FaTrash className="cursor-pointer text-3xl text-white" />
                 ) : (
@@ -91,7 +154,14 @@ const Profile = () => {
                 )}
               </div>
             )}
-            {/* <input type="text" /> */}
+            <input
+              type="file"
+              ref={fileInputRef}
+              className="hidden"
+              onChange={handleImageChange}
+              name="profile-image"
+              accept=".png, .jpg, .jpeg, .svg, .webp"
+            />
           </div>
           <div className="flex min-w-32 flex-col items-center justify-center gap-5 text-white md:min-w-64">
             <div className="w-full">

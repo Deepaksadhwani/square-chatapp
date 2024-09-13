@@ -30,3 +30,17 @@ export async function updateUserProfile(
   }).select("-password");
   return res;
 }
+
+export async function updateUserImage(id: string, image: string) {
+  const res = await User.findByIdAndUpdate(
+    id,
+    { image },
+    { new: true, runValidators: true }
+  ).select("image");
+  return res;
+}
+
+export async function deleteUserImage(id: string) {
+  const user = await User.findByIdAndUpdate(id, { $set: { image: null } });
+  return user;
+}
