@@ -1,4 +1,4 @@
-import { Request,  Response } from "express";
+import { Request, Response } from "express";
 import {
   deleteUserImage,
   findUser,
@@ -12,12 +12,14 @@ import {
   updateProfileSchema,
 } from "../utils/zod-schemas";
 import {
+  extractPublicId,
   generateToken,
   hashPassword,
   verifyPassword,
 } from "../utils/securityHelpers";
 import { renameSync, unlinkSync } from "fs";
 import User from "../models/user";
+import cloudinary from "../services/cloudinary";
 
 const maxAge = 3 * 24 * 60 * 60 * 1000;
 
@@ -155,11 +157,14 @@ export const addImageController = async (req: any, res: Response) => {
     if (!req.file) {
       return res.status(400).json({ message: "File is required." });
     }
-    const date = Date.now();
-    let fileName = "uploads/profiles/" + date + req.file.originalname;
-    renameSync(req.file.path, fileName);
-    console.log(fileName);
-    const updatedUser = await updateUserImage(req.userId, fileName);
+
+    const result = await cloudinary.uploader.upload(req.file.path, {
+      folder: "zenChats",
+    });
+    console.log(result);
+    const updatedUser = await updateUserImage(req.userId, result.secure_url);
+
+    unlinkSync(req.file.path); 
     res.status(200).json({
       image: updatedUser,
     });
@@ -179,8 +184,11 @@ export const removeImageController = async (req: any, res: Response) => {
     }
 
     if (user.image) {
-      console.log("hit")
-      unlinkSync(user.image);
+      console.log("deleting image from cloudinary ");
+
+      const publicId = extractPublicId(user.image);
+      console.log("extracted", publicId)
+      await cloudinary.uploader.destroy(publicId);
     }
 
     res.status(200).json({ message: "Profile image removed Successfully." });

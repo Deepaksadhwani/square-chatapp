@@ -78,7 +78,7 @@ const Profile = () => {
           formData,
           { withCredentials: true },
         );
-
+        console.log(response)
         if (response.status === 200 && response.data.image) {
           dispatch(
             setUserData({ ...userData, image: response.data.image.image }),
@@ -112,7 +112,7 @@ const Profile = () => {
       setLastName(userData.lastName);
       setSelectColor(userData.color);
     }
-    if (userData.image) setImage(`${IMAGE_URL}/${userData.image}`);
+    if (userData.image) setImage(userData.image);
   }, [userData]);
 
   return (
