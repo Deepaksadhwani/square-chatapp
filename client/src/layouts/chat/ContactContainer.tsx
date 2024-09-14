@@ -1,5 +1,6 @@
 import Logo from "@/components/Logo";
 import Title from "@/components/Title";
+import ProfileInfo from "./ContactContainer/ProfileInfo";
 
 const ContactContainer = () => {
   return (
@@ -17,6 +18,7 @@ const ContactContainer = () => {
           <Title text="Channels" />
         </div>
       </div>
+      <ProfileInfo/>
     </div>
   );
 };
