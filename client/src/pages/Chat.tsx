@@ -1,3 +1,6 @@
+import ChatContainer from "@/layouts/chat/ChatContainer";
+import ContactContainer from "@/layouts/chat/ContactContainer";
+import EmptyChatContainer from "@/layouts/chat/EmptyChatContainer";
 import { RootState } from "@/store/app-store";
 import { useEffect } from "react";
 import { useSelector } from "react-redux";
@@ -16,7 +19,13 @@ const Chat = () => {
       navigate("/profile");
     }
   }, [navigate, userProfileStatus]);
-  return <div>Chat</div>;
+  return (
+    <div className="flex h-screen overflow-hidden text-white">
+      <ContactContainer />
+      {/* <EmptyChatContainer /> */}
+      <ChatContainer />
+    </div>
+  );
 };
 
 export default Chat;
