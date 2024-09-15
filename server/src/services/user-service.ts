@@ -44,3 +44,5 @@ export async function deleteUserImage(id: string) {
   const user = await User.findByIdAndUpdate(id, { $set: { image: null } });
   return user;
 }
+
+
