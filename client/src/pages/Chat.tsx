@@ -11,6 +11,9 @@ const Chat = () => {
   const userProfileStatus = useSelector(
     (state: RootState) => state.user.userData?.profileSetup,
   );
+  const chatType = useSelector(
+    (state: RootState) => state.chat?.selectedChatType,
+  );
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -22,8 +25,7 @@ const Chat = () => {
   return (
     <div className="flex h-screen overflow-hidden text-white">
       <ContactContainer />
-      {/* <EmptyChatContainer /> */}
-      <ChatContainer />
+      {chatType === null ? <EmptyChatContainer /> : <ChatContainer />}
     </div>
   );
 };
