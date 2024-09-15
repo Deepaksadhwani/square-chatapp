@@ -3,6 +3,7 @@ import {
   addImageController,
   getUserInfoController,
   loginController,
+  logoutController,
   removeImageController,
   signupController,
   updateProfileController,
@@ -22,8 +23,5 @@ userRouter.post(
   upload.single("profile-image"),
   addImageController
 );
-userRouter.delete(
-  "/remove-profile-image",
-  verifyToken,
-  removeImageController
-);
+userRouter.delete("/remove-profile-image", verifyToken, removeImageController);
+userRouter.post("/logout", logoutController);

@@ -5,22 +5,38 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { apiClient } from "@/lib/api-client";
 import { getColor } from "@/lib/utils";
-import { RootState } from "@/store/app-store";
+import { AppDispatch, RootState } from "@/store/app-store";
+import { setUserData } from "@/store/slices/user-slice";
 import { FiEdit2 } from "react-icons/fi";
-import {  IoPowerSharp } from "react-icons/io5";
-import { useSelector } from "react-redux";
-import {  useNavigate } from "react-router-dom";
+import { IoPowerSharp } from "react-icons/io5";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 const ProfileInfo = () => {
   const userData = useSelector((state: RootState) => state.user?.userData);
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 
-const logout = async () => {
-    
-  }
+  const logout = async () => {
+    try {
+      const res = await apiClient.post(
+        "/user/logout",
+        {},
+        { withCredentials: true },
+      );
+      if (res.status === 200) {
+        navigate("/auth");
+        dispatch(setUserData(null));
+      }
+      console.log(res);
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
-    <div className="absolute bottom-0 flex h-16 w-full items-center  justify-between bg-[#2a2b33] px-5">
+    <div className="absolute bottom-0 flex h-16 w-full items-center justify-between bg-[#2a2b33] px-5">
       <div className="flex items-center justify-center gap-3">
         <div className="relative h-12 w-12">
           <Avatar className="h-12 w-12 overflow-hidden rounded-full">
@@ -49,7 +65,10 @@ const logout = async () => {
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger>
-              <FiEdit2 onClick={()=> navigate("/profile")} className="text-xl font-medium text-purple-500" />
+              <FiEdit2
+                onClick={() => navigate("/profile")}
+                className="text-xl font-medium text-purple-500"
+              />
             </TooltipTrigger>
             <TooltipContent className="border-none bg-[#1c1b1e] text-white">
               Edit Profile
@@ -59,7 +78,10 @@ const logout = async () => {
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger>
-              <IoPowerSharp onClick={logout} className="text-xl font-medium text-purple-500" />
+              <IoPowerSharp
+                onClick={logout}
+                className="text-xl font-medium text-red-500"
+              />
             </TooltipTrigger>
             <TooltipContent className="border-none bg-[#1c1b1e] text-white">
               Logout
