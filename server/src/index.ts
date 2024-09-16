@@ -4,6 +4,7 @@ import { rootRouter } from "./routes";
 import { config } from "dotenv";
 import cookieParser from "cookie-parser";
 import mongoose from "mongoose";
+import setupSocket from "./socket";
 
 config();
 const app = express();
@@ -33,6 +34,8 @@ mongoose
   .then(() => console.log("DB connection successful."))
   .catch((err) => console.log(err.message));
 
-app.listen(process.env.PORT, () => {
+const server = app.listen(process.env.PORT, () => {
   console.log(`server is running on port ${process.env.PORT}`);
 });
+
+setupSocket(server);
