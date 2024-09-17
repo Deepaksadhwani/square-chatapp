@@ -7,6 +7,11 @@ interface ChatState {
   selectedChatMessages: any[];
 }
 
+interface Message {
+  recipient: any;
+  sender: any;
+}
+
 // Initial state
 const initialState: ChatState = {
   selectedChatType: null,
@@ -32,6 +37,25 @@ const chatSlice = createSlice({
       state.selectedChatType = null;
       state.selectedChatMessages = [];
     },
+    addMessage: (state, action: PayloadAction<Message>) => {
+      const selectedChatType = state.selectedChatType;
+      const message = action.payload;
+
+      state.selectedChatMessages = [
+        ...state.selectedChatMessages,
+        {
+          ...message,
+          recipient:
+            selectedChatType === "channel"
+              ? message.recipient
+              : message.recipient?._id,
+          sender:
+            selectedChatType === "channel"
+              ? message.sender
+              : message.sender?._id,
+        },
+      ];
+    },
   },
 });
 
@@ -40,6 +64,7 @@ export const {
   setSelectedChatData,
   setSelectedChatMessages,
   closeChat,
+  addMessage,
 } = chatSlice.actions;
 
 export default chatSlice.reducer;

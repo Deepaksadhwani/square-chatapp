@@ -3,23 +3,46 @@ import { GrAttachment } from "react-icons/gr";
 import { IoSend } from "react-icons/io5";
 import { RiEmojiStickerLine } from "react-icons/ri";
 import EmojiPicker, { Theme } from "emoji-picker-react";
+import { useSelector } from "react-redux";
+import { RootState } from "@/store/app-store";
+import { useSocket } from "@/contexts/socket";
 
 const MessageBar = () => {
-  const [Message, setMessage] = useState("");
+  const [message, setMessage] = useState("");
+  const socket: any = useSocket();
   const [emojiPickerOpen, setEmojiPickerOpen] = useState(false);
+  const selectedChatType = useSelector(
+    (state: RootState) => state.chat.selectedChatType,
+  );
+  const selectedChatData = useSelector(
+    (state: RootState) => state.chat.selectedChatData,
+  );
+  const userData = useSelector((state: RootState) => state.user.userData);
   const emojiRef = useRef<any>();
 
   const handleAddEmoji = (emoji: any) => {
     setMessage((msg) => msg + emoji.emoji);
   };
 
-  const handleSendMessage = async () => {};
+  const handleSendMessage = async () => {
+    if (selectedChatType === "contact") {
+      socket.emit("sendMessage", {
+        sender: userData.id || userData._id,
+        content: message,
+        recipient: selectedChatData._id ,
+        messageType: "text",
+        fileUrl: null,
+        message,
+      });
+      setMessage("");
+    }
+  };
 
   useEffect(() => {
     const handleClickOutside = (event: any) => {
       if (emojiRef && !emojiRef.current.contains(event.target)) {
         setEmojiPickerOpen(false);
-        console.log("moved")
+        console.log("moved");
       }
     };
 
@@ -32,10 +55,10 @@ const MessageBar = () => {
       <div className="flex flex-1 items-center gap-5 rounded-md bg-[#2a2b33] pr-5">
         <input
           type="text"
-          value={Message}
+          value={message}
           onChange={(e) => setMessage(e.target.value)}
           className="flex-1 rounded-md bg-transparent p-5 focus:border-none focus:outline-none"
-          placeholder="Enter Message"
+          placeholder="Enter message"
         />
         <button className="text-neutral-500 transition-all duration-300 focus:border-none focus:text-white focus:outline-none">
           <GrAttachment className="text-2xl" />

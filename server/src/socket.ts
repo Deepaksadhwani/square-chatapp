@@ -1,5 +1,5 @@
-import { disconnect } from "process";
 import { Server as SocketIOServer } from "socket.io";
+import { createMessage, getMessageData } from "./services/message-service";
 const setupSocket = (server: any) => {
   const io = new SocketIOServer(server, {
     cors: {
@@ -21,9 +21,23 @@ const setupSocket = (server: any) => {
     }
   };
 
+  const sendMessage = async (message: any) => {
+    const senderSocketId = userSocketMap.get(message.sender);
+    const recipientSocketId = userSocketMap.get(message.recipient);
+    const createdMessage = await createMessage(message);
+    const messageData = await getMessageData(createdMessage);
+
+    if (recipientSocketId) {
+      io.to(recipientSocketId).emit("receiveMessage", messageData);
+    }
+    if (senderSocketId) {
+      io.to(senderSocketId).emit("receiveMessage", messageData);
+    }
+  };
+
   io.on("connection", (socket) => {
     const userId = socket.handshake.query.userId;
-
+    console.log("userId", userId);
     if (userId) {
       userSocketMap.set(userId, socket.id);
       console.log(`User is connect ${userId} with socket ID: ${socket.id}`);
@@ -31,6 +45,7 @@ const setupSocket = (server: any) => {
       console.log("User ID not provided during connection.");
     }
 
+    socket.on("sendMessage", sendMessage);
     socket.on("disconnect", () => disconnect(socket));
   });
 };
