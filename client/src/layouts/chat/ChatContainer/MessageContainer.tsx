@@ -1,8 +1,11 @@
-import { RootState } from "@/store/app-store";
+import { AppDispatch, RootState } from "@/store/app-store";
 import { useEffect, useRef } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import moment from "moment";
+import { setSelectedChatMessages } from "@/store/slices/chat-slice";
+import { apiClient } from "@/lib/api-client";
 const MessageContainer = () => {
+  const dispatch = useDispatch<AppDispatch>();
   const scrollRef = useRef<any>();
   const ChatType = useSelector(
     (state: RootState) => state.chat.selectedChatType,
@@ -18,13 +21,14 @@ const MessageContainer = () => {
   const renderMessage = () => {
     let lastDate: any = null;
     return chatMessages.map((message, index) => {
+      
       const messageDate = moment(message.timestamp).format("YYYY-MM-DD");
       const showDate = messageDate !== lastDate;
       lastDate = messageDate;
       return (
         <div key={index}>
           {showDate && (
-            <div className="gray-500 my-2 text-center">
+            <div className="my-2 text-center text-gray-500">
               {moment(message.timestamp).format("LL")}
             </div>
           )}
@@ -45,11 +49,33 @@ const MessageContainer = () => {
           {message.content}
         </div>
       )}
-      <div className="text-gray-600 text-xs">
+      <div className="text-xs text-gray-400">
         {moment(message.timestamp).format("LT")}
       </div>
     </div>
   );
+
+  useEffect(() => {
+    const getMessages = async () => {
+      try {
+        const res = await apiClient.post(
+          "/messages/get-messages",
+          { id: ChatData._id },
+          { withCredentials: true },
+        );
+
+        if (res.data.messages) {
+          dispatch(setSelectedChatMessages(res.data.messages));
+        }
+      } catch (error) {
+        console.log({ error });
+      }
+    };
+    if (ChatData._id) {
+      if (ChatType === "contact") getMessages();
+    }
+  }, [ChatData, ChatType, setSelectedChatMessages]);
+
   useEffect(() => {
     if (scrollRef.current) {
       scrollRef.current.scrollIntoView({ behaviour: "smooth" });
