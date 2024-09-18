@@ -24,7 +24,12 @@ const MessageBar = () => {
     setMessage((msg) => msg + emoji.emoji);
   };
 
+  
   const handleSendMessage = async () => {
+    if (!socket) {
+      console.error("Socket is not connected.");
+      return;
+    }
     if (selectedChatType === "contact") {
       socket.emit("sendMessage", {
         sender: userData.id || userData._id,
@@ -37,7 +42,12 @@ const MessageBar = () => {
       setMessage("");
     }
   };
-
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      event.preventDefault(); 
+      handleSendMessage();
+    }
+  };
   useEffect(() => {
     const handleClickOutside = (event: any) => {
       if (emojiRef && !emojiRef.current.contains(event.target)) {
@@ -56,6 +66,7 @@ const MessageBar = () => {
         <input
           type="text"
           value={message}
+          onKeyDown={handleKeyDown}
           onChange={(e) => setMessage(e.target.value)}
           className="flex-1 rounded-md bg-transparent p-5 focus:border-none focus:outline-none"
           placeholder="Enter message"

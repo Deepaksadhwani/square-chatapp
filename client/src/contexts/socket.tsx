@@ -31,6 +31,7 @@ export const SocketProvider = ({ children }: socketProviderTypes) => {
         withCredentials: true,
         query: { userId: userData.id || userData._id },
       });
+
       socket.current.on("connect", () => {
         console.log("Connected to socket server.");
       });
