@@ -14,7 +14,7 @@ const ChatHeader = () => {
     (state: RootState) => state.chat?.selectedChatType,
   );
   return (
-    <div className="flex h-[10vh] items-center justify-between border-b-2 border-[#2f303b] px-20">
+    <div className="flex h-[10vh] poppins-medium items-center text-xl font-medium justify-between border-b-2 border-[#2f303b] px-5">
       <div className="flex w-full items-center justify-between gap-5">
         <div className="flex items-center justify-center gap-3">
           <div className="relative h-12 w-12">
@@ -49,7 +49,7 @@ const ChatHeader = () => {
             onClick={() => dispatch(closeChat())}
             className="text-neutral-500 transition-all duration-300 focus:border-none focus:text-white focus:outline-none"
           >
-            <RiCloseFill className="text-3xl" />
+            <RiCloseFill className="text-3xl hover:text-red-500"  />
           </button>
         </div>
       </div>

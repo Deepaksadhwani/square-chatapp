@@ -6,6 +6,7 @@ import EmojiPicker, { Theme } from "emoji-picker-react";
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/app-store";
 import { useSocket } from "@/contexts/socket";
+import { apiClient } from "@/lib/api-client";
 
 const MessageBar = () => {
   const [message, setMessage] = useState("");
@@ -19,12 +20,12 @@ const MessageBar = () => {
   );
   const userData = useSelector((state: RootState) => state.user.userData);
   const emojiRef = useRef<any>();
+  const fileInputRef = useRef<any>();
 
   const handleAddEmoji = (emoji: any) => {
     setMessage((msg) => msg + emoji.emoji);
   };
 
-  
   const handleSendMessage = async () => {
     if (!socket) {
       console.error("Socket is not connected.");
@@ -34,7 +35,7 @@ const MessageBar = () => {
       socket.emit("sendMessage", {
         sender: userData.id || userData._id,
         content: message,
-        recipient: selectedChatData._id ,
+        recipient: selectedChatData._id,
         messageType: "text",
         fileUrl: null,
         message,
@@ -44,7 +45,7 @@ const MessageBar = () => {
   };
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
-      event.preventDefault(); 
+      event.preventDefault();
       handleSendMessage();
     }
   };
@@ -60,6 +61,42 @@ const MessageBar = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [emojiRef]);
 
+  const attachmentClickHandler = async () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const changeAttachementHandler = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    try {
+      const file = event.target.files?.[0];
+      if (file) {
+        const formData = new FormData();
+        formData.append("file", file);
+        const res = await apiClient.post("/messages/upload-file", formData, {
+          withCredentials: true,
+        });
+
+        if (res.status === 200 && res.data) {
+          if (selectedChatType === "contact") {
+            socket.emit("sendMessage", {
+              sender: userData.id || userData._id,
+              content: undefined,
+              recipient: selectedChatData._id,
+              messageType: "file",
+              fileUrl: res.data.path,
+            });
+          }
+        }
+      }
+      console.log({ file });
+      console.log({});
+    } catch (error) {
+      console.log({ error });
+    }
+  };
   return (
     <div className="mb-6 flex h-[10vh] items-center justify-center gap-6 bg-[#1c1d25] px-8">
       <div className="flex flex-1 items-center gap-5 rounded-md bg-[#2a2b33] pr-5">
@@ -71,9 +108,19 @@ const MessageBar = () => {
           className="flex-1 rounded-md bg-transparent p-5 focus:border-none focus:outline-none"
           placeholder="Enter message"
         />
-        <button className="text-neutral-500 transition-all duration-300 focus:border-none focus:text-white focus:outline-none">
+        <button
+          onClick={attachmentClickHandler}
+          className="text-neutral-500 transition-all duration-300 focus:border-none focus:text-white focus:outline-none"
+        >
           <GrAttachment className="text-2xl" />
         </button>
+        <input
+          type="file"
+          className="hidden"
+          ref={fileInputRef}
+          onChange={changeAttachementHandler}
+           accept=".png, .jpg, .jpeg, .svg, .webp"
+        />
         <div className="relative">
           <button
             onClick={() => setEmojiPickerOpen(true)}

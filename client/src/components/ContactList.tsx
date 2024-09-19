@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { Avatar } from "./ui/avatar";
 import { getColor } from "@/lib/utils";
 import { AvatarImage } from "@radix-ui/react-avatar";
+import moment from "moment";
 
 const ContactList = ({
   contacts,
@@ -24,46 +25,66 @@ const ContactList = ({
   const handleClick = (contact: any) => {
     if (isChannel) dispatch(setSelectedChatType("channel"));
     else dispatch(setSelectedChatType("contact"));
-    console.log(contact);
     dispatch(setSelectedChatData(contact));
     if (selectedChatData && selectedChatData._id !== contact._id) {
-      dispatch(setSelectedChatMessages([])); // if current contact is open and we switch to previous contact we need to clear those message
+      dispatch(setSelectedChatMessages([])); // Clear messages if switching to a different contact
     }
   };
+
   return (
-    <div className="mt-5">
+    <div className="mt-5 space-y-2">
       {contacts.map((contact: any) => (
         <div
           key={contact._id}
           onClick={() => handleClick(contact)}
-          className={`cursor-pointer py-2 pl-10 transition-all duration-300 ${selectedChatData && selectedChatData._id === contact._id ? "bg-[#8417ff] hover:bg-[#8417ff]" : "hover:bg-[#f1f1f111]"}`}
+          className={`flex cursor-pointer items-center rounded-lg p-3 transition-all duration-300 ${
+            selectedChatData && selectedChatData._id === contact._id
+              ? "bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
+              : "bg-[#2a2b33] hover:bg-[#3a3b43]"
+          }`}
         >
-          <div className="flex items-center justify-start gap-5 text-neutral-300">
-            {!isChannel && (
-              <div className="flex items-center gap-2">
-           
-                <Avatar className="h-10 w-10 overflow-hidden rounded-full">
-                  {contact.image ? (
-                    <AvatarImage
-                      src={contact.image}
-                      alt="profile"
-                      className="h-full w-full bg-black object-cover"
-                    />
-                  ) : (
-                    <div
-                      className={`flex h-10 w-10 items-center justify-center rounded-full border-[1px] text-lg uppercase ${getColor(contact.color)}`}
-                    >
-                      {contact.firstName
-                        ? contact.firstName[0]
-                        : contact.email[0]}
-                    </div>
-                  )}
-                </Avatar>
-                {contact.firstName && contact.lastName
-                  ? `${contact.firstName} ${contact.lastName}`
-                  : ""}
+          <div className="flex items-center gap-4">
+            <Avatar className="h-12 w-12 overflow-hidden rounded-full border-2 border-white shadow-md">
+              {contact.image ? (
+                <AvatarImage
+                  src={contact.image}
+                  alt={`${contact.firstName} ${contact.lastName}`}
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <div
+                  className={`flex h-12 w-12 items-center justify-center rounded-full text-lg uppercase ${getColor(
+                    contact.color,
+                  )}`}
+                >
+                  {contact.firstName ? contact.firstName[0] : contact.email[0]}
+                </div>
+              )}
+            </Avatar>
+            {isChannel && (
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#ffffff22]">
+                #
               </div>
             )}
+            {
+              <div className="flex-1 ">
+                {!isChannel ? (
+                  <div className="text-lg poppins-medium font-semibold text-white">
+                    {contact.firstName && contact.lastName
+                      ? `${contact.firstName} ${contact.lastName}`
+                      : contact.email}
+                  </div>
+                ) : (
+                  <div className="text-lg poppins-medium font-semibold text-white">
+                    {contact.name}
+                  </div>
+                )}
+
+                <div className="text-sm text-gray-200">
+                  {moment(contact.lastMessageTime).fromNow()}
+                </div>
+              </div>
+            }
           </div>
         </div>
       ))}

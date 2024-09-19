@@ -17,7 +17,7 @@ import {
   hashPassword,
   verifyPassword,
 } from "../utils/securityHelpers";
-import { renameSync, unlinkSync } from "fs";
+import {  unlinkSync } from "fs";
 import User from "../models/user";
 import cloudinary from "../services/cloudinary";
 
@@ -159,7 +159,12 @@ export const addImageController = async (req: any, res: Response) => {
     }
 
     const result = await cloudinary.uploader.upload(req.file.path, {
-      folder: "zenChats",
+      folder: "square",
+      width: 800,
+      height: 800,
+      crop: "limit", // Ensure image is within the specified size limits
+      quality: "auto:good", // Automatically adjust quality for good balance
+      format: "jpg", // Convert image to JPG format
     });
     console.log(result);
     const updatedUser = await updateUserImage(req.userId, result.secure_url);
