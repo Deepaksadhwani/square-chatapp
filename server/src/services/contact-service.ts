@@ -1,7 +1,7 @@
 import Message from "../models/message";
 import User from "../models/user";
 
-export async function getAllContacts(req: any, regex: any) {
+export async function getFilterContacts(req: any, regex: any) {
   console.log("regex from console.log", regex);
   const contacts = await User.find({
     $and: [
@@ -65,3 +65,5 @@ export async function getUserContactWithOrder(userId: string) {
   ]);
   return contacts;
 }
+
+
