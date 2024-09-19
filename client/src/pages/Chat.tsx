@@ -15,7 +15,6 @@ const Chat = () => {
     (state: RootState) => state.chat?.selectedChatType,
   );
   const navigate = useNavigate();
-
   useEffect(() => {
     if (!userProfileStatus) {
       toast.error("Please setup profile to continue.");

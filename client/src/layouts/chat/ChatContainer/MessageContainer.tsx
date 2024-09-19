@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import moment from "moment";
 import { setSelectedChatMessages } from "@/store/slices/chat-slice";
 import { apiClient } from "@/lib/api-client";
+
 const MessageContainer = () => {
   const dispatch = useDispatch<AppDispatch>();
   const scrollRef = useRef<any>();
@@ -16,19 +17,18 @@ const MessageContainer = () => {
   const chatMessages = useSelector(
     (state: RootState) => state.chat.selectedChatMessages,
   );
-  const userData = useSelector((state: RootState) => state.user.userData);
 
+ 
   const renderMessage = () => {
     let lastDate: any = null;
     return chatMessages.map((message, index) => {
-      
       const messageDate = moment(message.timestamp).format("YYYY-MM-DD");
       const showDate = messageDate !== lastDate;
       lastDate = messageDate;
       return (
         <div key={index}>
           {showDate && (
-            <div className="my-2 text-center text-gray-500">
+            <div className="my-4 text-center text-sm font-semibold text-gray-50">
               {moment(message.timestamp).format("LL")}
             </div>
           )}
@@ -40,17 +40,23 @@ const MessageContainer = () => {
 
   const renderDmMessages = (message: any) => (
     <div
-      className={`${message.sender === ChatData._id ? "text-left" : "text-right"}`}
+      className={`flex my-2 ${
+        message.sender === ChatData._id ? "justify-start" : "justify-end"
+      }`}
     >
-      {message.messageType === "text" && (
-        <div
-          className={`${message.sender !== ChatData._id ? "border-[#8417ff]/50 bg-[#8417ff]/5 text-[#8417ff]/90" : "border-white/20 bg-[#2a2a33]/5 text-white/80"} my-1 inline-block max-w-[50vw] break-words rounded border p-4`}
-        >
-          {message.content}
+      <div
+        className={`${
+          message.sender !== ChatData._id
+            ? "bg-gradient-to-r from-purple-600 via-purple-500 to-purple-400 font-medium text-white"
+            : "bg-gray-700 text-white"
+        } max-w-[75%] rounded-lg p-3 shadow-md transition duration-300 ease-in-out transform hover:scale-105`}
+      >
+        {message.messageType === "text" && (
+          <div className="text-sm md:text-base">{message.content}</div>
+        )}
+        <div className="mt-1 text-right text-xs text-gray-100">
+          {moment(message.timestamp).format("LT")}
         </div>
-      )}
-      <div className="text-xs text-gray-400">
-        {moment(message.timestamp).format("LT")}
       </div>
     </div>
   );
@@ -78,12 +84,12 @@ const MessageContainer = () => {
 
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollIntoView({ behaviour: "smooth" });
+      scrollRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [chatMessages]);
 
   return (
-    <div className="scrollbar-hidden w-full flex-1 overflow-y-auto p-4 px-8 md:w-[65w] lg:w-[70vw] xl:w-[80vw]">
+    <div className="scrollbar-hidden flex-1 w-full overflow-y-auto p-4 px-6 md:px-8 lg:px-12">
       {renderMessage()}
       <div ref={scrollRef} />
     </div>
