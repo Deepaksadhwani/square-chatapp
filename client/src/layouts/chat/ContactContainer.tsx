@@ -14,6 +14,7 @@ const ContactContainer = () => {
   const directMessagesContacts = useSelector(
     (state: RootState) => state.chat.directMessagesContacts,
   );
+  const channelList = useSelector((state: RootState) => state.chat.channels);
   const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
@@ -41,14 +42,17 @@ const ContactContainer = () => {
           <Title text="Direct Messages" />
           <NewDM />
         </div>
-        <div className="max-h-[38vw] overflow-y-auto scrollbar-hidden">
-           <ContactList contacts={directMessagesContacts}/>
+        <div className="scrollbar-hidden max-h-[38vw] overflow-y-auto">
+          <ContactList contacts={directMessagesContacts} />
         </div>
       </div>
       <div className="my-5">
         <div className="flex items-center justify-between pr-10">
           <Title text="Channels" />
-          <CreateChannel/>
+          <CreateChannel />
+        </div>
+        <div className="scrollbar-hidden max-h-[38vw] overflow-y-auto">
+          <ContactList contacts={channelList} isChannel={true} />
         </div>
       </div>
       <ProfileInfo />

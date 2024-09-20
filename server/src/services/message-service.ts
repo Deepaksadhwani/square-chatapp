@@ -1,4 +1,3 @@
-import { timeStamp } from "console";
 import Message from "../models/message";
 
 export const createMessage = async (message: any) => {

@@ -14,23 +14,15 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import Lottie from "react-lottie";
-import { animationDefaultOptions, getColor } from "@/lib/utils";
 import { apiClient } from "@/lib/api-client";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/store/app-store";
-import {
-  setSelectedChatData,
-  setSelectedChatType,
-} from "@/store/slices/chat-slice";
 import { Button } from "@/components/ui/button";
 import MultipleSelector from "@/components/ui/MultipleSelector";
+import { addChannel } from "@/store/slices/chat-slice";
 
 const CreateChannel = () => {
   const [openNewChannelModel, setNewChannelModel] = useState(false);
-  const [searchedContacts, setSearchedContacts] = useState([]);
   const [allContacts, setAllContacts] = useState([]);
   const [selectedContacts, setSelectedContacts] = useState<any>([]);
   const [channelName, setChannelName] = useState("");
@@ -48,7 +40,28 @@ const CreateChannel = () => {
     getData();
   }, []);
 
-  const createChannel = async () => {};
+  const createChannel = async () => {
+    try {
+      if (channelName.length > 0 && selectedContacts.length > 0) {
+        const res = await apiClient.post(
+          "/channels/create-channel",
+          {
+            name: channelName,
+            members: selectedContacts.map((contact: any) => contact.value),
+          },
+          { withCredentials: true },
+        );
+        if (res.status === 201) {
+          setChannelName("");
+          setSelectedContacts([]);
+          setNewChannelModel(false);
+          dispatch(addChannel(res.data.channel));
+        }
+      }
+    } catch (error) {
+      console.log({ error });
+    }
+  };
   return (
     <>
       <TooltipProvider>

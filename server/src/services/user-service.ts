@@ -46,6 +46,18 @@ export async function deleteUserImage(id: string) {
 }
 
 export async function getAllContacts(id: string) {
-  const res = await User.find({ _id: { $ne: id } }, "fistName lastName _id email");
-  return res
+  const res = await User.find(
+    { _id: { $ne: id } },
+    "fistName lastName _id email"
+  );
+  return res;
+}
+
+export async function findUserChannel(id: string) {
+  const res = await User.findById(id);
+  return res;
+}
+export async function getMembers(members: any) {
+  const res = await User.find({ _id: { $in: members } });
+  return res;
 }

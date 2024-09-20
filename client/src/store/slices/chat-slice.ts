@@ -6,6 +6,7 @@ interface ChatState {
   selectedChatData: any | null;
   selectedChatMessages: any[];
   directMessagesContacts: any[];
+  channels: any[];
 }
 
 interface Message {
@@ -19,6 +20,7 @@ const initialState: ChatState = {
   selectedChatData: null,
   selectedChatMessages: [],
   directMessagesContacts: [],
+  channels: [],
 };
 
 const chatSlice = createSlice({
@@ -36,6 +38,12 @@ const chatSlice = createSlice({
     },
     setDirectMessagesContact: (state, action: PayloadAction<any[]>) => {
       state.directMessagesContacts = action.payload;
+    },
+    setChannel: (state, action: PayloadAction<any[]>) => {
+      state.channels = action.payload;
+    },
+    addChannel: (state, action: PayloadAction<any[]>) => {
+      state.channels = [action.payload, ...state.channels];
     },
     closeChat: (state) => {
       state.selectedChatData = null;
@@ -71,6 +79,8 @@ export const {
   setSelectedChatMessages,
   closeChat,
   addMessage,
+  setChannel,
+  addChannel,
 } = chatSlice.actions;
 
 export default chatSlice.reducer;
