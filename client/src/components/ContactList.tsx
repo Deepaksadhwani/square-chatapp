@@ -30,7 +30,7 @@ const ContactList = ({
       dispatch(setSelectedChatMessages([])); // Clear messages if switching to a different contact
     }
   };
-
+  
   return (
     <div className="mt-5 space-y-2">
       {contacts.map((contact: any) => (
@@ -44,7 +44,7 @@ const ContactList = ({
           }`}
         >
           <div className="flex items-center gap-4">
-            <Avatar className="h-12 w-12 overflow-hidden rounded-full border-2 border-white shadow-md">
+          { !isChannel && <Avatar className="h-12 w-12 overflow-hidden rounded-full border-2 border-white shadow-md">
               {contact.image ? (
                 <AvatarImage
                   src={contact.image}
@@ -60,7 +60,7 @@ const ContactList = ({
                   {contact.firstName ? contact.firstName[0] : contact.email[0]}
                 </div>
               )}
-            </Avatar>
+            </Avatar>}
             {isChannel && (
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#ffffff22]">
                 #
@@ -80,9 +80,9 @@ const ContactList = ({
                   </div>
                 )}
 
-                <div className="text-sm text-gray-200">
+               {!isChannel && <div className="text-sm text-gray-200">
                   {moment(contact.lastMessageTime).fromNow()}
-                </div>
+                </div>}
               </div>
             }
           </div>

@@ -6,7 +6,10 @@ import { useEffect } from "react";
 import { apiClient } from "@/lib/api-client";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/store/app-store";
-import { setDirectMessagesContact } from "@/store/slices/chat-slice";
+import {
+  setChannel,
+  setDirectMessagesContact,
+} from "@/store/slices/chat-slice";
 import ContactList from "@/components/ContactList";
 import CreateChannel from "./ContactContainer/CreateChannel";
 
@@ -26,12 +29,22 @@ const ContactContainer = () => {
         dispatch(setDirectMessagesContact(res.data.contacts));
       }
     };
+    const getChannels = async () => {
+      const res = await apiClient.get("/channels/get-channels", {
+        withCredentials: true,
+      });
+      
+      if (res.data.channels) {
+        dispatch(setChannel(res.data.channels));
+      }
+    };
     try {
       getContacts();
+      getChannels();
     } catch (error) {
       console.log({ error });
     }
-  }, []);
+  }, [setChannel, setDirectMessagesContact]);
   return (
     <div className="lg:[w-[30vw] relative w-full border-r-2 border-[#2f303b] bg-[#1b1c24] md:w-[35vw] xl:w-[20vw]">
       <div className="pt-3">

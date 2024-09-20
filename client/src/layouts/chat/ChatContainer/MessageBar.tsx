@@ -40,8 +40,17 @@ const MessageBar = () => {
         fileUrl: null,
         message,
       });
-      setMessage("");
+    } else if (selectedChatType === "channel") {
+      socket.emit("send-channel-message", {
+        sender: userData.id || userData._id,
+        content: message,
+        messageType: "text",
+        fileUrl: null,
+        message,
+        channelId: selectedChatData._id,
+      });
     }
+    setMessage("");
   };
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
@@ -88,6 +97,15 @@ const MessageBar = () => {
               messageType: "file",
               fileUrl: res.data.path,
             });
+          } else if (selectedChatType === "channel") {
+           
+            socket.emit("send-channel-message", {
+              sender: userData.id || userData._id,
+              content: undefined,
+              messageType: "file",
+              fileUrl: res.data.path,
+              channelId: selectedChatData._id,
+            });
           }
         }
       }
@@ -119,7 +137,7 @@ const MessageBar = () => {
           className="hidden"
           ref={fileInputRef}
           onChange={changeAttachementHandler}
-           accept=".png, .jpg, .jpeg, .svg, .webp"
+          accept=".png, .jpg, .jpeg, .svg, .webp"
         />
         <div className="relative">
           <button

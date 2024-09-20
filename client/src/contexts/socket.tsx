@@ -42,9 +42,12 @@ export const SocketProvider = ({ children }: socketProviderTypes) => {
         console.log("message received", message);
         dispatch(addMessage(message));
       };
-
+      const handleReceiveChannelMessage = (message: any) => {
+        console.log("receive channel message", message);
+        dispatch(addMessage(message));
+      };
       socket.current.on("receiveMessage", handleReceiveMessage);
-
+      socket.current.on("receive-channel-message", handleReceiveChannelMessage);
       return () => socket.current.disconnect();
     }
   }, [userData]);

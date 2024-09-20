@@ -1,7 +1,8 @@
 import { Response } from "express";
 import { findUserChannel, getMembers } from "../services/user-service";
-import { createChannel } from "../services/channel-service";
+import { createChannel, getUserChannels } from "../services/channel-service";
 import { channel } from "diagnostics_channel";
+import mongoose from "mongoose";
 
 export const createChannelController = async (req: any, res: Response) => {
   try {
@@ -18,9 +19,20 @@ export const createChannelController = async (req: any, res: Response) => {
         .status(400)
         .json({ message: "some members are not valid users." });
     }
-    const NewChannel = await createChannel(name,members,userId);
+    const NewChannel = await createChannel(name, members, userId);
 
-    return res.status(201).json({ channel: NewChannel});
+    return res.status(201).json({ channel: NewChannel });
+  } catch (error) {
+    console.log({ error });
+    return res.status(500).json({ message: "Internal Server Error." });
+  }
+};
+
+export const getUserChannelsController = async (req: any, res: Response) => {
+  try {
+    const channels = await getUserChannels(req.userId);
+    
+    return res.status(201).json({ channels });
   } catch (error) {
     console.log({ error });
     return res.status(500).json({ message: "Internal Server Error." });

@@ -21,3 +21,10 @@ export const getChatMessages = async (user1: string, user2: string) => {
   }).sort({ timeStamp: 1 });
   return messages;
 };
+
+export const getChannelMessageData = async (createdMessage: any) => {
+  const messageData = await Message.findById(createdMessage._id)
+    .populate("sender", "id email lastName firstName image color")
+    .exec();
+  return messageData;
+};

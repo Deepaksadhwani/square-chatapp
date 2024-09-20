@@ -14,11 +14,11 @@ const ChatHeader = () => {
     (state: RootState) => state.chat?.selectedChatType,
   );
   return (
-    <div className="flex h-[10vh] poppins-medium items-center text-xl font-medium justify-between border-b-2 border-[#2f303b] px-5">
-      <div className="flex w-full items-center justify-between gap-5">
+    <div className="poppins-medium flex h-[11vh] items-center justify-between border-b-2 border-[#2f303b] px-5 text-xl font-medium">
+      <div className="flex w-full items-center mt-2 justify-between gap-5">
         <div className="flex items-center justify-center gap-3">
           <div className="relative h-12 w-12">
-            {selectedChatData && (
+            {selectedChatType === "contact" ? (
               <Avatar className="h-12 w-12 overflow-hidden rounded-full">
                 {selectedChatData.image ? (
                   <AvatarImage
@@ -36,9 +36,14 @@ const ChatHeader = () => {
                   </div>
                 )}
               </Avatar>
+            ) : (
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#ffffff22]">
+                #
+              </div>
             )}
           </div>
           <div>
+            {selectedChatType === "channel" && selectedChatData.name}
             {selectedChatType === "contact" && selectedChatData.firstName
               ? `${selectedChatData.firstName} ${selectedChatData.lastName}`
               : selectedChatData.email}
@@ -49,7 +54,7 @@ const ChatHeader = () => {
             onClick={() => dispatch(closeChat())}
             className="text-neutral-500 transition-all duration-300 focus:border-none focus:text-white focus:outline-none"
           >
-            <RiCloseFill className="text-3xl hover:text-red-500"  />
+            <RiCloseFill className="text-3xl hover:text-red-500" />
           </button>
         </div>
       </div>

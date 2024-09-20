@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import moment from "moment";
 import { setSelectedChatMessages } from "@/store/slices/chat-slice";
 import { apiClient } from "@/lib/api-client";
-import { FiXCircle } from "react-icons/fi"; 
+import { FiXCircle } from "react-icons/fi";
 
 const MessageContainer = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -19,6 +19,7 @@ const MessageContainer = () => {
   const chatMessages = useSelector(
     (state: RootState) => state.chat.selectedChatMessages,
   );
+  const userData = useSelector((state: RootState) => state.user.userData);
 
   const renderMessage = () => {
     let lastDate: any = null;
@@ -34,6 +35,7 @@ const MessageContainer = () => {
             </div>
           )}
           {ChatType === "contact" && renderDmMessages(message)}
+          {ChatType === "channel" && renderChannelMessages(message)}
         </div>
       );
     });
@@ -61,7 +63,7 @@ const MessageContainer = () => {
               src={message.fileUrl}
               alt="uploaded"
               className="h-auto max-h-[200px] w-full max-w-[300px] rounded-lg object-contain"
-              onClick={() => setExpandedImage(message.fileUrl)} 
+              onClick={() => setExpandedImage(message.fileUrl)}
             />
           </div>
         )}
@@ -72,7 +74,40 @@ const MessageContainer = () => {
     </div>
   );
 
-
+  const renderChannelMessages = (message: any) => {
+    return (
+      <div
+      className={`my-2 flex ${
+        message.sender._id !== userData._id  ? "justify-start" : "justify-end"
+      }`}
+    >
+      <div
+        className={`${
+          message.sender._id === userData._id
+            ? "bg-gradient-to-r from-purple-600 via-purple-500 to-purple-400 font-medium text-white"
+            : "bg-gray-700 text-white"
+        } max-w-[75%] transform rounded-lg p-2 shadow-md transition duration-300 ease-in-out hover:scale-105`}
+      >
+        {message.messageType === "text" && (
+          <div className="text-sm md:text-base">{message.content}</div>
+        )}
+        {message.messageType === "file" && (
+          <div className="flex cursor-pointer justify-center">
+            <img
+              src={message.fileUrl}
+              alt="uploaded"
+              className="h-auto max-h-[200px] w-full max-w-[300px] rounded-lg object-contain"
+              onClick={() => setExpandedImage(message.fileUrl)}
+            />
+          </div>
+        )}
+        <div className="mt-1 text-right text-xs text-gray-100">
+          {moment(message.timestamp).format("LT")}
+        </div>
+      </div>
+    </div>
+    );
+  };
   useEffect(() => {
     const getMessages = async () => {
       try {
@@ -103,9 +138,9 @@ const MessageContainer = () => {
   return (
     <div className="scrollbar-hidden w-full flex-1 overflow-y-auto p-4 px-6 md:px-8 lg:px-12">
       {renderMessage()}
-      <div ref={scrollRef}  />
+      <div ref={scrollRef} />
       {expandedImage && (
-        <div className="fixed inset-0 z-50 backdrop-blur-sm flex items-center justify-center bg-black bg-opacity-75">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-75 backdrop-blur-sm">
           <div className="relative max-h-[90%] max-w-[90%]">
             <img
               src={expandedImage}
@@ -118,7 +153,6 @@ const MessageContainer = () => {
             >
               <FiXCircle />
             </button>
-           
           </div>
         </div>
       )}
