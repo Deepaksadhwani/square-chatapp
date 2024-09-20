@@ -5,6 +5,8 @@ import moment from "moment";
 import { setSelectedChatMessages } from "@/store/slices/chat-slice";
 import { apiClient } from "@/lib/api-client";
 import { FiXCircle } from "react-icons/fi";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { getColor } from "@/lib/utils";
 
 const MessageContainer = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -75,39 +77,84 @@ const MessageContainer = () => {
   );
 
   const renderChannelMessages = (message: any) => {
+    const isOwnMessage = message.sender._id === userData._id;
+  
     return (
-      <div
-      className={`my-2 flex ${
-        message.sender._id !== userData._id  ? "justify-start" : "justify-end"
-      }`}
-    >
-      <div
-        className={`${
-          message.sender._id === userData._id
-            ? "bg-gradient-to-r from-purple-600 via-purple-500 to-purple-400 font-medium text-white"
-            : "bg-gray-700 text-white"
-        } max-w-[75%] transform rounded-lg p-2 shadow-md transition duration-300 ease-in-out hover:scale-105`}
-      >
-        {message.messageType === "text" && (
-          <div className="text-sm md:text-base">{message.content}</div>
-        )}
-        {message.messageType === "file" && (
-          <div className="flex cursor-pointer justify-center">
-            <img
-              src={message.fileUrl}
-              alt="uploaded"
-              className="h-auto max-h-[200px] w-full max-w-[300px] rounded-lg object-contain"
-              onClick={() => setExpandedImage(message.fileUrl)}
-            />
+      <div className="my-3 flex flex-col gap-1">
+        <div
+          className={`flex ${isOwnMessage ? "justify-end" : "justify-start"}`}
+        >
+          <div
+            className={`max-w-[75%] p-3 rounded-lg shadow-lg transition transform duration-300 ease-in-out hover:scale-105 ${
+              isOwnMessage
+                ? "bg-gradient-to-r from-purple-600 via-purple-500 to-purple-400 text-white"
+                : "bg-gray-700 text-white"
+            }`}
+          >
+            {/* Message Content */}
+            {message.messageType === "text" && (
+              <p className="text-sm md:text-base leading-relaxed">
+                {message.content}
+              </p>
+            )}
+  
+            {/* File Message with Image */}
+            {message.messageType === "file" && (
+              <div className="flex justify-center cursor-pointer mt-2">
+                <img
+                  src={message.fileUrl}
+                  alt="uploaded"
+                  className="h-auto max-h-[200px] w-full max-w-[300px] rounded-lg object-contain"
+                  onClick={() => setExpandedImage(message.fileUrl)}
+                />
+              </div>
+            )}
           </div>
-        )}
-        <div className="mt-1 text-right text-xs text-gray-100">
-          {moment(message.timestamp).format("LT")}
+        </div>
+            {/* // user, image, name and time section */}
+        <div
+          className={`flex items-center gap-2 mt-1 ${
+            isOwnMessage ? "justify-end text-right" : "justify-start text-left"
+          }`}
+        >
+          <Avatar className="h-8 w-8 rounded-full overflow-hidden">
+            {isOwnMessage ? null : (
+              message.sender.image ? (
+                <AvatarImage
+                  src={message.sender.image}
+                  alt="profile"
+                  className="h-full w-full bg-black object-cover"
+                />
+              ) : (
+                <AvatarFallback
+                  className={`flex h-8 w-8 items-center justify-center rounded-full text-lg uppercase ${getColor(
+                    message.sender.color
+                  )}`}
+                >
+                  {message.sender.firstName
+                    ? message.sender.firstName[0]
+                    : message.sender.email[0]}
+                </AvatarFallback>
+              )
+            )}
+          </Avatar>
+  
+          <span className="text-sm text-gray-400">
+            {!isOwnMessage && `${message.sender.firstName} ${message.sender.lastName}`}
+          </span>
+  
+          <time
+            className="text-xs text-gray-400"
+            dateTime={new Date(message.timestamp).toISOString()}
+          >
+            {moment(message.timestamp).format("LT")}
+          </time>
         </div>
       </div>
-    </div>
     );
   };
+  
+  
   useEffect(() => {
     const getMessages = async () => {
       try {
@@ -136,7 +183,7 @@ const MessageContainer = () => {
   }, [chatMessages]);
 
   return (
-    <div className="scrollbar-hidden w-full flex-1 overflow-y-auto p-4 px-6 md:px-8 lg:px-12">
+    <div className="scrollbar-hidden w-full flex-1 overflow-y-auto p-4 px-6 md:px-8 lg:px-8">
       {renderMessage()}
       <div ref={scrollRef} />
       {expandedImage && (

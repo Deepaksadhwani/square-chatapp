@@ -37,7 +37,7 @@ const ContactList = ({
         <div
           key={contact._id}
           onClick={() => handleClick(contact)}
-          className={`flex cursor-pointer items-center rounded-lg p-3 transition-all duration-300 ${
+          className={`flex cursor-pointer items-center rounded-lg p-2 transition-all duration-300 ${
             selectedChatData && selectedChatData._id === contact._id
               ? "bg-gradient-to-r from-purple-500 to-blue-500 hover:from-purple-600 hover:to-blue-600"
               : "bg-[#2a2b33] hover:bg-[#3a3b43]"
@@ -69,13 +69,13 @@ const ContactList = ({
             {
               <div className="flex-1 ">
                 {!isChannel ? (
-                  <div className="text-lg poppins-medium font-semibold text-white">
+                  <div className=" poppins-medium font-semibold text-white">
                     {contact.firstName && contact.lastName
                       ? `${contact.firstName} ${contact.lastName}`
                       : contact.email}
                   </div>
                 ) : (
-                  <div className="text-lg poppins-medium font-semibold text-white">
+                  <div className="text poppins-medium font-semibold text-white">
                     {contact.name}
                   </div>
                 )}
