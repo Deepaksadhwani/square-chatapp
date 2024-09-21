@@ -1,5 +1,9 @@
 import { AppDispatch, RootState } from "@/store/app-store";
-import { addMessage } from "@/store/slices/chat-slice";
+import {
+  addChannelInChannelList,
+  addContactsInDMContacts,
+  addMessage,
+} from "@/store/slices/chat-slice";
 import { useContext, useEffect, createContext, useRef, ReactNode } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { io } from "socket.io-client";
@@ -41,10 +45,12 @@ export const SocketProvider = ({ children }: socketProviderTypes) => {
 
         console.log("message received", message);
         dispatch(addMessage(message));
+        dispatch(addContactsInDMContacts(message));
       };
       const handleReceiveChannelMessage = (message: any) => {
         console.log("receive channel message", message);
         dispatch(addMessage(message));
+        dispatch(addChannelInChannelList(message));
       };
       socket.current.on("receiveMessage", handleReceiveMessage);
       socket.current.on("receive-channel-message", handleReceiveChannelMessage);

@@ -30,7 +30,7 @@ const ContactList = ({
       dispatch(setSelectedChatMessages([])); // Clear messages if switching to a different contact
     }
   };
-  
+
   return (
     <div className="mt-5 space-y-2">
       {contacts.map((contact: any) => (
@@ -44,32 +44,36 @@ const ContactList = ({
           }`}
         >
           <div className="flex items-center gap-4">
-          { !isChannel && <Avatar className="h-12 w-12 overflow-hidden rounded-full border-2 border-white shadow-md">
-              {contact.image ? (
-                <AvatarImage
-                  src={contact.image}
-                  alt={`${contact.firstName} ${contact.lastName}`}
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <div
-                  className={`flex h-12 w-12 items-center justify-center rounded-full text-lg uppercase ${getColor(
-                    contact.color,
-                  )}`}
-                >
-                  {contact.firstName ? contact.firstName[0] : contact.email[0]}
-                </div>
-              )}
-            </Avatar>}
+            {!isChannel && (
+              <Avatar className="h-12 w-12 overflow-hidden rounded-full border-2 border-white shadow-md">
+                {contact.image ? (
+                  <AvatarImage
+                    src={contact.image}
+                    alt={`${contact.firstName} ${contact.lastName}`}
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <div
+                    className={`flex h-12 w-12 items-center justify-center rounded-full text-lg uppercase ${getColor(
+                      contact.color,
+                    )}`}
+                  >
+                    {contact.firstName
+                      ? contact.firstName[0]
+                      : contact.email[0]}
+                  </div>
+                )}
+              </Avatar>
+            )}
             {isChannel && (
               <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#ffffff22]">
                 #
               </div>
             )}
             {
-              <div className="flex-1 ">
+              <div className="flex-1">
                 {!isChannel ? (
-                  <div className=" poppins-medium font-semibold text-white">
+                  <div className="poppins-medium font-semibold text-white">
                     {contact.firstName && contact.lastName
                       ? `${contact.firstName} ${contact.lastName}`
                       : contact.email}
@@ -80,9 +84,11 @@ const ContactList = ({
                   </div>
                 )}
 
-               {!isChannel && <div className="text-sm text-gray-200">
-                  {moment(contact.lastMessageTime).fromNow()}
-                </div>}
+                {!isChannel && (
+                  <div className="text-sm text-gray-200">
+                    {moment(contact.lastMessageTime).fromNow()}
+                  </div>
+                )}
               </div>
             }
           </div>

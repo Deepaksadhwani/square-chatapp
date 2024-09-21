@@ -39,6 +39,7 @@ const Auth = () => {
         { withCredentials: true },
       );
       if (res.data.id) {
+       
         dispatch(setUserData(res.data))
         if (res.data.profileSetup) navigate("/chat");
         else navigate("/profile");
