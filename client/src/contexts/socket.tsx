@@ -3,6 +3,7 @@ import {
   addChannelInChannelList,
   addContactsInDMContacts,
   addMessage,
+  fetchContacts,
 } from "@/store/slices/chat-slice";
 import { useContext, useEffect, createContext, useRef, ReactNode } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -45,7 +46,7 @@ export const SocketProvider = ({ children }: socketProviderTypes) => {
 
         console.log("message received", message);
         dispatch(addMessage(message));
-        dispatch(addContactsInDMContacts(message));
+        dispatch(fetchContacts());
       };
       const handleReceiveChannelMessage = (message: any) => {
         console.log("receive channel message", message);
