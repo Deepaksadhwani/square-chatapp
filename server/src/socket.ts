@@ -8,7 +8,7 @@ import Channel from "./models/Channel";
 const setupSocket = (server: any) => {
   const io = new SocketIOServer(server, {
     cors: {
-      origin: "http://localhost:5173",
+      origin: "https://square-chatapp.netlify.app",
       methods: ["GET", "POST"],
       credentials: true,
     },

@@ -1,3 +1,3 @@
-export const SERVER_URL = "http://localhost:3000/api/v1";
-export const IMAGE_URL = "http://localhost:3000"
+export const SERVER_URL = "https://square-chatapp.onrender.com/api/v1";
+export const IMAGE_URL = "https://square-chatapp.onrender.com"
 

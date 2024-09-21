@@ -11,7 +11,7 @@ const app = express();
 const DATABASE_URL: string = process.env.DATABASE_URL || "";
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: "https://square-chatapp.netlify.app",
     methods: ["GET", "POST", "PUT", "DELETE"],
     credentials: true,
   })

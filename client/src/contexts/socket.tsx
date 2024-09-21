@@ -32,7 +32,7 @@ export const SocketProvider = ({ children }: socketProviderTypes) => {
   if (selectedChatData && selectedChatType) console.log("UserChat section"); // random condtion to pass run  build to use this varible
   useEffect(() => {
     if (userData) {
-      socket.current = io("http://localhost:3000/", {
+      socket.current = io("https://square-chatapp.onrender.com/", {
         withCredentials: true,
         query: { userId: userData.id || userData._id },
       });
