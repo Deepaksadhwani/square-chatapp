@@ -77,15 +77,16 @@ const MessageContainer = () => {
   );
 
   const renderChannelMessages = (message: any) => {
-    const isOwnMessage = message.sender._id === userData._id;
-  
+    const isOwnMessage =
+      message.sender._id === userData._id || message.sender._id === userData.id;
+
     return (
       <div className="my-3 flex flex-col gap-1">
         <div
           className={`flex ${isOwnMessage ? "justify-end" : "justify-start"}`}
         >
           <div
-            className={`max-w-[75%] p-3 rounded-lg shadow-lg transition transform duration-300 ease-in-out hover:scale-105 ${
+            className={`max-w-[75%] transform rounded-lg p-3 shadow-lg transition duration-300 ease-in-out hover:scale-105 ${
               isOwnMessage
                 ? "bg-gradient-to-r from-purple-600 via-purple-500 to-purple-400 text-white"
                 : "bg-gray-700 text-white"
@@ -93,14 +94,14 @@ const MessageContainer = () => {
           >
             {/* Message Content */}
             {message.messageType === "text" && (
-              <p className="text-sm md:text-base leading-relaxed">
+              <p className="text-sm leading-relaxed md:text-base">
                 {message.content}
               </p>
             )}
-  
+
             {/* File Message with Image */}
             {message.messageType === "file" && (
-              <div className="flex justify-center cursor-pointer mt-2">
+              <div className="mt-2 flex cursor-pointer justify-center">
                 <img
                   src={message.fileUrl}
                   alt="uploaded"
@@ -111,38 +112,37 @@ const MessageContainer = () => {
             )}
           </div>
         </div>
-            {/* // user, image, name and time section */}
+        {/* // user, image, name and time section */}
         <div
-          className={`flex items-center gap-2 mt-1 ${
+          className={`mt-1 flex items-center gap-2 ${
             isOwnMessage ? "justify-end text-right" : "justify-start text-left"
           }`}
         >
-          <Avatar className="h-8 w-8 rounded-full overflow-hidden">
-            {isOwnMessage ? null : (
-              message.sender.image ? (
-                <AvatarImage
-                  src={message.sender.image}
-                  alt="profile"
-                  className="h-full w-full bg-black object-cover"
-                />
-              ) : (
-                <AvatarFallback
-                  className={`flex h-8 w-8 items-center justify-center rounded-full text-lg uppercase ${getColor(
-                    message.sender.color
-                  )}`}
-                >
-                  {message.sender.firstName
-                    ? message.sender.firstName[0]
-                    : message.sender.email[0]}
-                </AvatarFallback>
-              )
+          <Avatar className="h-8 w-8 overflow-hidden rounded-full">
+            {isOwnMessage ? null : message.sender.image ? (
+              <AvatarImage
+                src={message.sender.image}
+                alt="profile"
+                className="h-full w-full bg-black object-cover"
+              />
+            ) : (
+              <AvatarFallback
+                className={`flex h-8 w-8 items-center justify-center rounded-full text-lg uppercase ${getColor(
+                  message.sender.color,
+                )}`}
+              >
+                {message.sender.firstName
+                  ? message.sender.firstName[0]
+                  : message.sender.email[0]}
+              </AvatarFallback>
             )}
           </Avatar>
-  
+
           <span className="text-sm text-gray-400">
-            {!isOwnMessage && `${message.sender.firstName} ${message.sender.lastName}`}
+            {!isOwnMessage &&
+              `${message.sender.firstName} ${message.sender.lastName}`}
           </span>
-  
+
           <time
             className="text-xs text-gray-400"
             dateTime={new Date(message.timestamp).toISOString()}
@@ -153,8 +153,7 @@ const MessageContainer = () => {
       </div>
     );
   };
-  
-  
+
   useEffect(() => {
     const getMessages = async () => {
       try {
@@ -171,8 +170,22 @@ const MessageContainer = () => {
         console.log({ error });
       }
     };
+    const getChannelMessage = async () => {
+      try {
+        const res = await apiClient.get(
+          `/channels/get-channel-messages/${ChatData._id}`,
+          { withCredentials: true },
+        );
+        if (res.data.messages) {
+          dispatch(setSelectedChatMessages(res.data.messages));
+        }
+      } catch (error) {
+        console.log({ error });
+      }
+    };
     if (ChatData._id) {
       if (ChatType === "contact") getMessages();
+      else if (ChatType === "channel") getChannelMessage();
     }
   }, [ChatData, ChatType, setSelectedChatMessages]);
 

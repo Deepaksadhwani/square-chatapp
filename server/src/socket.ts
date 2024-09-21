@@ -54,7 +54,7 @@ const setupSocket = (server: any) => {
     const messageData: any = await getChannelMessageData(createdMessage);
 
     await Channel.findByIdAndUpdate(channelId, {
-      $push: { message: createdMessage._id },
+      $push: { messages: createdMessage._id },
     });
 
     const channel: any = await Channel.findById(channelId).populate("members");

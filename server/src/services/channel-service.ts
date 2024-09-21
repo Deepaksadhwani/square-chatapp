@@ -12,3 +12,14 @@ export async function getUserChannels(id: string) {
   }).sort({ updatedAt: -1 });
   return channels;
 }
+
+export async function getChannelMessages(channelId: string) {
+  const channel = await Channel.findById(channelId).populate({
+    path: "messages",
+    populate: {
+      path: "sender",
+      select: "firstName lastName email _id image color",
+    },
+  });
+  return channel;
+}
