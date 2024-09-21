@@ -1,10 +1,10 @@
+import ProfilePageLoader from "@/components/loaders/ProfilePageLoader";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { apiClient } from "@/lib/api-client";
 import { colors, getColor } from "@/lib/utils";
 import { AppDispatch, RootState } from "@/store/app-store";
 import { setUserData } from "@/store/slices/user-slice";
-import { IMAGE_URL } from "@/utils/constants";
 import { Avatar, AvatarImage } from "@radix-ui/react-avatar";
 import { useEffect, useRef, useState } from "react";
 import { FaPlus, FaTrash } from "react-icons/fa";
@@ -23,6 +23,7 @@ const Profile = () => {
   const [hover, setHover] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
   const fileInputRef = useRef<any>(null);
+  const [loader, setLoader] = useState(true);
 
   const validateProfile = () => {
     if (!firstName) {
@@ -43,7 +44,7 @@ const Profile = () => {
           { firstName, lastName, color: selectColor },
           { withCredentials: true },
         );
-        console.log(res);
+
         if (res.status === 200) {
           dispatch(setUserData(res.data.data));
           toast.success("Profile updated successfully");
@@ -71,6 +72,7 @@ const Profile = () => {
     const file = event.target.files[0];
     if (file) {
       try {
+        setLoader(true);
         const formData = new FormData();
         formData.append("profile-image", file);
         const response = await apiClient.post(
@@ -78,7 +80,7 @@ const Profile = () => {
           formData,
           { withCredentials: true },
         );
-        console.log(response)
+
         if (response.status === 200 && response.data.image) {
           dispatch(
             setUserData({ ...userData, image: response.data.image.image }),
@@ -87,12 +89,15 @@ const Profile = () => {
         }
       } catch (error) {
         console.log(error);
+      } finally {
+        setLoader(false);
       }
     }
   };
-  console.log(userData);
+
   const handleDeleteImage = async () => {
     try {
+      setLoader(true);
       const res = await apiClient.delete("user/remove-profile-image", {
         withCredentials: true,
       });
@@ -103,6 +108,8 @@ const Profile = () => {
       }
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoader(false);
     }
   };
 
@@ -113,9 +120,16 @@ const Profile = () => {
       setSelectColor(userData.color);
     }
     if (userData.image) setImage(userData.image);
+
+    const timer = setTimeout(() => {
+      setLoader(false);
+    }, 500);
+    return () => clearTimeout(timer);
   }, [userData]);
 
-  return (
+  return loader ? (
+    <ProfilePageLoader />
+  ) : (
     <div className="flex h-screen flex-col items-center justify-center gap-10 bg-[#1b1c24]">
       <div className="flex w-[80vw] flex-col gap-10 md:w-max">
         <div onClick={exitNavigateHandler}>

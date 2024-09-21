@@ -27,7 +27,6 @@ export const createChannelController = async (req: any, res: Response) => {
 
     return res.status(201).json({ channel: NewChannel });
   } catch (error) {
-    console.log({ error });
     return res.status(500).json({ message: "Internal Server Error." });
   }
 };
@@ -38,7 +37,6 @@ export const getUserChannelsController = async (req: any, res: Response) => {
 
     return res.status(201).json({ channels });
   } catch (error) {
-    console.log({ error });
     return res.status(500).json({ message: "Internal Server Error." });
   }
 };
@@ -50,11 +48,10 @@ export const getChannelMessageController = async (req: any, res: Response) => {
     if (!channel) {
       return res.status(404).json({ message: "channel not found." });
     }
-    const messages = channel.messages
-    console.log(channel)
+    const messages = channel.messages;
+
     return res.status(201).json({ messages });
   } catch (error) {
-    console.log({ error });
     return res.status(500).json({ message: "Internal Server Error." });
   }
 };

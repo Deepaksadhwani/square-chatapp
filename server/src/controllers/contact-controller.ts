@@ -23,7 +23,6 @@ export const searchContactsController = async (req: any, res: Response) => {
 
     res.status(200).json({ contacts });
   } catch (error) {
-    console.log({ error });
     return res.status(500).json({ message: "Internal Server Error." });
   }
 };
@@ -39,7 +38,6 @@ export const getContactForDmListController = async (
 
     res.status(200).json({ contacts });
   } catch (error) {
-    console.log({ error });
     return res.status(500).json({ message: "Internal Server Error." });
   }
 };
@@ -54,7 +52,6 @@ export const getAllContactsController = async (req: any, res: Response) => {
     }));
     res.status(200).json({ contacts });
   } catch (error) {
-    console.log({ error });
     return res.status(500).json({ message: "Internal Server Error." });
   }
 };

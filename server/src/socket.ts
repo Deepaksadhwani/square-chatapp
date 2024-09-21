@@ -17,7 +17,6 @@ const setupSocket = (server: any) => {
   const userSocketMap = new Map();
 
   const disconnect = (socket: any) => {
-    console.log(`Client Disconnected: ${socket.id}`);
     for (const [userId, socketId] of userSocketMap.entries()) {
       if (socketId === socket.id) {
         userSocketMap.delete(userId);
@@ -76,12 +75,9 @@ const setupSocket = (server: any) => {
 
   io.on("connection", (socket) => {
     const userId = socket.handshake.query.userId;
-    console.log("userId", userId);
+
     if (userId) {
       userSocketMap.set(userId, socket.id);
-      console.log(`User is connect ${userId} with socket ID: ${socket.id}`);
-    } else {
-      console.log("User ID not provided during connection.");
     }
     socket.on("send-channel-message", sendChannelMessage);
     socket.on("sendMessage", sendMessage);

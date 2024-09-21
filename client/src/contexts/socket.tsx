@@ -1,7 +1,6 @@
 import { AppDispatch, RootState } from "@/store/app-store";
 import {
   addChannelInChannelList,
-  addContactsInDMContacts,
   addMessage,
   fetchContacts,
 } from "@/store/slices/chat-slice";
@@ -29,7 +28,8 @@ export const SocketProvider = ({ children }: socketProviderTypes) => {
   const selectedChatData = useSelector(
     (state: RootState) => state.chat.selectedChatData,
   );
-  console.log(selectedChatData, selectedChatType);
+  // facing issue if do not keep varible inside in component useeffect does not work if pass this two varible in dependancy array
+  if (selectedChatData && selectedChatType) console.log("UserChat section"); // random condtion to pass run  build to use this varible
   useEffect(() => {
     if (userData) {
       socket.current = io("http://localhost:3000/", {
@@ -37,19 +37,13 @@ export const SocketProvider = ({ children }: socketProviderTypes) => {
         query: { userId: userData.id || userData._id },
       });
 
-      socket.current.on("connect", () => {
-        console.log("Connected to socket server.");
-      });
+      socket.current.on("connect", () => {});
 
       const handleReceiveMessage = (message: any) => {
-        console.log(selectedChatData, selectedChatType);
-
-        console.log("message received", message);
         dispatch(addMessage(message));
         dispatch(fetchContacts());
       };
       const handleReceiveChannelMessage = (message: any) => {
-        console.log("receive channel message", message);
         dispatch(addMessage(message));
         dispatch(addChannelInChannelList(message));
       };

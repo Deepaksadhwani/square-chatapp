@@ -208,10 +208,10 @@ const MessageContainer = () => {
               className="max-h-full max-w-full rounded-lg object-contain"
             />
             <button
-              className="absolute right-4 top-4 text-3xl  text-white"
+              className="absolute right-4 top-4 text-3xl text-white"
               onClick={() => setExpandedImage(null)}
             >
-              <FiXCircle className="text-gray-700"/>
+              <FiXCircle className="text-gray-700" />
             </button>
           </div>
         </div>

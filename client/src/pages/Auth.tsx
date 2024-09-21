@@ -3,19 +3,22 @@ import Background from "@/assets/login2.png";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { apiClient } from "@/lib/api-client";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "@/store/app-store";
 import { setUserData } from "@/store/slices/user-slice";
+import AuthPageLoader from "@/components/loaders/AuthLoader";
 const Auth = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [loader, setLoader] = useState(true);
+
   const navigate = useNavigate();
-  const dispatch = useDispatch<AppDispatch>()
+  const dispatch = useDispatch<AppDispatch>();
   const validateSignup = () => {
     if (!email.length) {
       toast.error("Email is required.");
@@ -32,6 +35,7 @@ const Auth = () => {
     return true;
   };
   const longinHandler = async () => {
+    setLoader(true);
     try {
       const res = await apiClient.post(
         "/user/login",
@@ -39,17 +43,18 @@ const Auth = () => {
         { withCredentials: true },
       );
       if (res.data.id) {
-       
-        dispatch(setUserData(res.data))
+        dispatch(setUserData(res.data));
         if (res.data.profileSetup) navigate("/chat");
         else navigate("/profile");
       }
-      console.log(res);
     } catch (error) {
       console.log(error);
+    } finally {
+      setLoader(false);
     }
   };
   const signupHandler = async () => {
+    setLoader(true);
     if (validateSignup()) {
       try {
         const res = await apiClient.post(
@@ -58,16 +63,25 @@ const Auth = () => {
           { withCredentials: true },
         );
         if (res.status === 201) {
-           dispatch(setUserData(res.data))
+          dispatch(setUserData(res.data));
           navigate("/profile");
         }
-        console.log(res);
       } catch (error) {
         console.log(error);
+      } finally {
+        setLoader(false);
       }
     }
   };
-  return (
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoader(false);
+    }, 700);
+    return () => clearTimeout(timer);
+  }, []);
+  return loader ? (
+    <AuthPageLoader />
+  ) : (
     <div className="flex h-screen w-screen items-center justify-center">
       <div className="grid h-[80vh] w-[80vw] rounded-3xl border-2 border-white bg-white text-opacity-90 shadow-2xl md:w-[90vw] lg:w-[70vw] xl:w-[60vw] xl:grid-cols-2">
         <div className="flex flex-col items-center justify-center gap-10">
@@ -77,7 +91,7 @@ const Auth = () => {
               <img src={Victory} alt="Victory Emoji" className="h-[100px]" />
             </div>
             <p className="text-center font-medium">
-              Fill in the details to get started with best chat app!
+              Fill in the details to get started with square chat app!
             </p>
           </div>
           <div className="flex w-full items-center justify-center">

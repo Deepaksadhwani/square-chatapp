@@ -17,7 +17,7 @@ import {
   hashPassword,
   verifyPassword,
 } from "../utils/securityHelpers";
-import {  unlinkSync } from "fs";
+import { unlinkSync } from "fs";
 import User from "../models/user";
 import cloudinary from "../services/cloudinary";
 
@@ -39,7 +39,7 @@ export const signupController = async (req: Request, res: Response) => {
   try {
     const encryptedPassword = await hashPassword(password, 10);
     const user: any = await insertUser(email, encryptedPassword);
-    console.log(user);
+
     const token = generateToken(user._id);
     res.cookie("token", token, {
       maxAge,
@@ -57,7 +57,6 @@ export const signupController = async (req: Request, res: Response) => {
       email: user.email,
     });
   } catch (error) {
-    console.log({ error });
     return res.status(500).json({ Message: "Internal Server Error" });
   }
 };
@@ -118,14 +117,12 @@ export const getUserInfoController = async (req: any, res: Response) => {
       data: userData,
     });
   } catch (error) {
-    console.log({ error });
     return res.status(500).json({ message: "Internal Server Error." });
   }
 };
 
 // update user profile
 export const updateProfileController = async (req: any, res: Response) => {
-  console.log(req.body);
   const parsed = updateProfileSchema.safeParse(req.body);
   if (!parsed.success) {
     return res
@@ -146,7 +143,6 @@ export const updateProfileController = async (req: any, res: Response) => {
       data: updatedUserData,
     });
   } catch (error) {
-    console.log({ error });
     return res.status(500).json({ message: "Internal Server Error." });
   }
 };
@@ -166,7 +162,7 @@ export const addImageController = async (req: any, res: Response) => {
       quality: "auto:good", // Automatically adjust quality for good balance
       format: "jpg", // Convert image to JPG format
     });
-    console.log(result);
+
     const updatedUser = await updateUserImage(req.userId, result.secure_url);
 
     unlinkSync(req.file.path);
@@ -174,14 +170,12 @@ export const addImageController = async (req: any, res: Response) => {
       image: updatedUser,
     });
   } catch (error) {
-    console.log({ error });
     return res.status(500).json({ message: "Internal Server Error." });
   }
 };
 
 //delete image  Controller
 export const removeImageController = async (req: any, res: Response) => {
-  console.log(req.body);
   try {
     const user = await deleteUserImage(req.userId);
     if (!user) {
@@ -189,16 +183,13 @@ export const removeImageController = async (req: any, res: Response) => {
     }
 
     if (user.image) {
-      console.log("deleting image from cloudinary ");
-
       const publicId = extractPublicId(user.image);
-      console.log("extracted", publicId);
+
       await cloudinary.uploader.destroy(publicId);
     }
 
     res.status(200).json({ message: "Profile image removed Successfully." });
   } catch (error) {
-    console.log({ error });
     return res.status(500).json({ message: "Internal Server Error." });
   }
 };
@@ -209,7 +200,6 @@ export const logoutController = async (req: any, res: Response) => {
     res.cookie("token", "", { maxAge: 1, secure: true, sameSite: "none" });
     res.status(200).json({ message: "Logout Successfully." });
   } catch (error) {
-    console.log({ error });
     return res.status(500).json({ message: "Internal Server Error." });
   }
 };

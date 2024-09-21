@@ -2,7 +2,6 @@ import Message from "../models/message";
 import User from "../models/user";
 
 export async function getFilterContacts(req: any, regex: any) {
-  console.log("regex from console.log", regex);
   const contacts = await User.find({
     $and: [
       { _id: { $ne: req.userId } },
@@ -65,5 +64,3 @@ export async function getUserContactWithOrder(userId: string) {
   ]);
   return contacts;
 }
-
-

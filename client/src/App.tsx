@@ -7,6 +7,7 @@ import { AppDispatch, RootState } from "./store/app-store";
 import { FC, useEffect, useState } from "react";
 import { apiClient } from "./lib/api-client";
 import { setUserData } from "./store/slices/user-slice";
+import ChatPageLoader from "./components/loaders/ChatPageLoader";
 
 interface RouteProps {
   children: React.ReactNode;
@@ -24,8 +25,6 @@ const AuthRoute: FC<RouteProps> = ({ children }) => {
   return dataPresent ? <Navigate to="/chat" /> : children;
 };
 
-
-
 //App component
 const App = () => {
   const userData = useSelector((state: RootState) => state.user.userData);
@@ -37,25 +36,30 @@ const App = () => {
         const response = await apiClient.get("/user/user-info", {
           withCredentials: true,
         });
-        console.log(response)
         if (response.status === 200) {
           dispatch(setUserData(response.data.data));
         }
       } catch (error) {
         console.log({ error });
-      }finally {
-        setLoading(false)
+      } finally {
+        setTimeout(() => {
+          setLoading(false);
+        }, 700);
       }
     };
     if (!userData) {
       getUserData();
-    } else {
-      setLoading(false);
     }
+
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 700);
+
+    return () => clearTimeout(timer);
   }, [userData, setUserData]);
 
   if (loading) {
-    return <div>Loading....</div>;
+    return <ChatPageLoader />;
   }
   return (
     <BrowserRouter>

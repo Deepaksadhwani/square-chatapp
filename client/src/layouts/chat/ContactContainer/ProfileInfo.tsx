@@ -30,7 +30,6 @@ const ProfileInfo = () => {
         navigate("/auth");
         dispatch(setUserData(null));
       }
-      console.log(res);
     } catch (error) {
       console.log(error);
     }

@@ -62,7 +62,6 @@ const MessageBar = () => {
     const handleClickOutside = (event: any) => {
       if (emojiRef && !emojiRef.current.contains(event.target)) {
         setEmojiPickerOpen(false);
-        console.log("moved");
       }
     };
 
@@ -98,7 +97,6 @@ const MessageBar = () => {
               fileUrl: res.data.path,
             });
           } else if (selectedChatType === "channel") {
-           
             socket.emit("send-channel-message", {
               sender: userData.id || userData._id,
               content: undefined,
@@ -109,8 +107,6 @@ const MessageBar = () => {
           }
         }
       }
-      console.log({ file });
-      console.log({});
     } catch (error) {
       console.log({ error });
     }

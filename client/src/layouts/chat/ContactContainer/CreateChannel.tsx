@@ -55,7 +55,6 @@ const CreateChannel = () => {
           setChannelName("");
           setSelectedContacts([]);
           setNewChannelModel(false);
-          console.log(res.data)
           dispatch(addChannel(res.data.channel));
         }
       }

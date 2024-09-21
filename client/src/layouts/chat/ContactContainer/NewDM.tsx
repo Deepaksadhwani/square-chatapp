@@ -40,7 +40,6 @@ const NewDM = () => {
           { withCredentials: true },
         );
         if (res.status === 200 && res.data.contacts) {
-          console.log(res);
           setSearchedContacts(res.data.contacts);
         } else {
           setSearchedContacts([]);
@@ -102,7 +101,7 @@ const NewDM = () => {
                           <AvatarImage
                             src={contact.image}
                             alt="profile"
-                            className="h-full w-full bg-black rounded-full object-cover"
+                            className="h-full w-full rounded-full bg-black object-cover"
                           />
                         ) : (
                           <div
@@ -130,7 +129,7 @@ const NewDM = () => {
           )}
 
           {searchedContacts.length > 0 ? null : (
-            <div className="flex-1 flex-col mt-5 md:mt-0 items-center justify-center transition-all duration-1000 md:flex md:bg-[#181920]">
+            <div className="mt-5 flex-1 flex-col items-center justify-center transition-all duration-1000 md:mt-0 md:flex md:bg-[#181920]">
               <Lottie
                 options={animationDefaultOptions}
                 isClickToPauseDisabled={true}

@@ -12,10 +12,9 @@ export const getMessagesController = async (req: any, res: Response) => {
       return res.status(400).json({ message: "Both ID's  are required." });
     }
     const messages = await getChatMessages(user1, user2);
-    console.log(messages);
+
     res.status(200).json({ messages });
   } catch (error) {
-    console.log({ error });
     return res.status(500).json({ message: "Internal Server Error." });
   }
 };
@@ -33,14 +32,12 @@ export const uploadFilesController = async (req: any, res: Response) => {
       quality: "auto:good", // Automatically adjust quality for good balance
       format: "jpg", // Convert image to JPG format
     });
-    console.log(result);
 
     unlinkSync(req.file.path);
     res.status(200).json({
       path: result.secure_url,
     });
   } catch (error) {
-    console.log("line 38", { error });
     return res.status(500).json({ message: "Internal Server Error." });
   }
 };
