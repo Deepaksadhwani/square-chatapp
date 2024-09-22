@@ -54,9 +54,10 @@ const Auth = () => {
     }
   };
   const signupHandler = async () => {
-    setLoader(true);
+  
     if (validateSignup()) {
       try {
+        setLoader(true);
         const res = await apiClient.post(
           "/user/signup",
           { email, password },
